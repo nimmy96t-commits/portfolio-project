@@ -1,43 +1,24 @@
 const express = require("express");
-const cors = require("cors");
 const { Pool } = require("pg");
+const path = require("path");
 
 const app = express();
 
-app.use(cors());
-app.use(express.json());
+app.use(express.static(path.join(__dirname)));
 
-// 🔹 CHANGE THE PASSWORD BELOW
 const pool = new Pool({
-  user: "postgres",
-  host: "localhost",
-  database: "portfolio_db",
-  password: "2007nr",   // 👈 PUT YOUR POSTGRES PASSWORD HERE
-  port: 5432,
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
-// Home route
 app.get("/", (req, res) => {
-  res.send("Server connected to PostgreSQL");
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
-// Contact route
-app.post("/contact", async (req, res) => {
-  const { name, email, message } = req.body;
+const PORT = process.env.PORT || 3000;
 
-  try {
-    await pool.query(
-      "INSERT INTO public.contacts (name, email, message) VALUES ($1, $2, $3)",
-      [name, email, message]
-    );
-
-    res.send("Message saved to database!");
-  } catch (error) {
-    console.error(error);
-    res.status(500).send("Database error");
-  }
-});
-
-app.listen(3000, () => {
-  console.log("Server running at http://localhost:3000");
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
