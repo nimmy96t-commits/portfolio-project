@@ -50,7 +50,15 @@ app.post("/contact", async (req, res) => {
     res.status(500).json({ success: false });
   }
 });
-
+app.get("/messages", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT * FROM messages ORDER BY id DESC");
+    res.json(result.rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error fetching messages");
+  }
+});
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
