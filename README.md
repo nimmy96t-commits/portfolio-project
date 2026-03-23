@@ -1,6 +1,6 @@
 # Full Stack Portfolio with CI/CD Pipeline
 
-## 📌 Project Overvieww
+## 📌 Project Overview
 
 This is a full-stack portfolio web application that showcases projects and allows users to submit messages through a contact form.
 It demonstrates frontend, backend, database integration, and CI/CD pipeline.
