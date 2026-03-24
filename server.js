@@ -1,66 +1,41 @@
-const express = require("express");
-const path = require("path");
-const { Pool } = require("pg");
-
+const express = require('express');
+const path = require('path');
 const app = express();
 
 // Middleware
 app.use(express.json());
-app.use(express.static(path.join(__dirname)));
+app.use(express.urlencoded({ extended: true }));
 
-// PostgreSQL connection (Render)
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-});
+// ✅ VERY IMPORTANT (serve HTML, CSS, JS)
+app.use(express.static(__dirname));
 
-// Serve frontend
-app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
-});
+// Temporary storage (you can replace with DB later)
+let messages = [];
 
-// Contact route
-app.post("/contact", async (req, res) => {
-  const { name, email, message } = req.body;
+// Route to save message
+app.post('/contact', (req, res) => {
+    const { name, email, message } = req.body;
 
-  try {
-    // Create table if not exists
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS messages (
-        id SERIAL PRIMARY KEY,
-        name TEXT NOT NULL,
-        email TEXT NOT NULL,
-        message TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
+    const newMessage = {
+        id: messages.length + 1,
+        name,
+        email,
+        message,
+        created_at: new Date()
+    };
 
-    // Insert message
-    await pool.query(
-      "INSERT INTO messages (name, email, message) VALUES ($1, $2, $3)",
-      [name, email, message]
-    );
+    messages.push(newMessage);
 
     res.json({ success: true });
+});
 
-  } catch (err) {
-    console.error("Database error:", err);
-    res.status(500).json({ success: false });
-  }
+// Route to get all messages
+app.get('/messages', (req, res) => {
+    res.json(messages);
 });
-app.get("/messages", async (req, res) => {
-  try {
-    const result = await pool.query("SELECT * FROM messages ORDER BY id DESC");
-    res.json(result.rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Error fetching messages");
-  }
-});
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
