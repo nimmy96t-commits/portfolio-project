@@ -1,48 +1,81 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Messages</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Received Messages</title>
+
     <style>
         body {
-            font-family: Arial;
+            font-family: Arial, sans-serif;
             background: #0f172a;
             color: white;
-            padding: 20px;
-        }
-        h1 {
             text-align: center;
         }
-        .message {
+
+        h1 {
+            margin-top: 20px;
+        }
+
+        #messages {
+            margin: 20px auto;
+            max-width: 600px;
+        }
+
+        .card {
             background: #1e293b;
             padding: 15px;
-            margin: 10px;
+            margin: 10px 0;
             border-radius: 10px;
+            text-align: left;
+        }
+
+        .card p {
+            margin: 5px 0;
+        }
+
+        .empty {
+            color: gray;
         }
     </style>
 </head>
+
 <body>
 
-<h1>Received Messages</h1>
-<div id="messages"></div>
+    <h1>Received Messages</h1>
 
-<script>
-fetch('/messages')
-.then(res => res.json())
-.then(data => {
-    const container = document.getElementById('messages');
+    <div id="messages">Loading...</div>
 
-    data.forEach(msg => {
-        const div = document.createElement('div');
-        div.className = 'message';
-        div.innerHTML = `
-            <b>Name:</b> ${msg.name}<br>
-            <b>Email:</b> ${msg.email}<br>
-            <b>Message:</b> ${msg.message}
-        `;
-        container.appendChild(div);
-    });
-});
-</script>
+    <script>
+        async function loadMessages() {
+            try {
+                const res = await fetch('/messages');
+                const data = await res.json();
+
+                const container = document.getElementById('messages');
+
+                if (data.length === 0) {
+                    container.innerHTML = "<p class='empty'>No messages yet</p>";
+                    return;
+                }
+
+                container.innerHTML = data.map(msg => `
+                    <div class="card">
+                        <p><b>Name:</b> ${msg.name}</p>
+                        <p><b>Email:</b> ${msg.email}</p>
+                        <p><b>Message:</b> ${msg.message}</p>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                document.getElementById('messages').innerHTML = 
+                    "<p class='empty'>Error loading messages</p>";
+                console.error(error);
+            }
+        }
+
+        loadMessages();
+    </script>
 
 </body>
 </html>
