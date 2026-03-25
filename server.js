@@ -4,56 +4,62 @@ const { Pool } = require('pg');
 
 const app = express();
 
-// PostgreSQL connection (Render gives DATABASE_URL)
+// ✅ PostgreSQL connection (Render DATABASE_URL)
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false
-    }
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
-// Middleware
+// ✅ Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
-// Create table (runs once)
+// ✅ Create table (runs automatically)
 pool.query(`
-    CREATE TABLE IF NOT EXISTS messages (
-        id SERIAL PRIMARY KEY,
-        name TEXT,
-        email TEXT,
-        message TEXT
-    )
-`);
+  CREATE TABLE IF NOT EXISTS messages (
+    id SERIAL PRIMARY KEY,
+    name TEXT,
+    email TEXT,
+    message TEXT
+  );
+`).then(() => {
+  console.log("Table ready");
+}).catch(err => console.log(err));
 
-// Save message
-app.post('/contact', async (req, res) => {
-    const { name, email, message } = req.body;
+// ✅ POST route (save message)
+app.post('/send', async (req, res) => {
+  const { name, email, message } = req.body;
 
-    try {
-        await pool.query(
-            'INSERT INTO messages (name, email, message) VALUES ($1, $2, $3)',
-            [name, email, message]
-        );
+  console.log("Received:", name, email, message);
 
-        console.log("Saved to DB:", name, email, message);
+  try {
+    await pool.query(
+      'INSERT INTO messages (name, email, message) VALUES ($1, $2, $3)',
+      [name, email, message]
+    );
 
-        res.json({ success: true });
-    } catch (err) {
-        console.error(err);
-        res.status(500).send("Error");
-    }
+    console.log("Saved to DB:", name, email, message);
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ success: false });
+  }
 });
 
-// Get messages
+// ✅ GET route (view messages - optional)
 app.get('/messages', async (req, res) => {
-    const result = await pool.query('SELECT * FROM messages');
-    res.json(result.rows);
+  const result = await pool.query('SELECT * FROM messages');
+  res.json(result.rows);
 });
+console.log("DB version running");
 
-// Start server
+// ✅ Start server
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
