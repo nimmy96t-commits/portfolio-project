@@ -4,7 +4,7 @@ const { Pool } = require('pg');
 
 const app = express();
 
-// ✅ PostgreSQL connection (Render DATABASE_URL)
+// PostgreSQL connection
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -12,28 +12,26 @@ const pool = new Pool({
   }
 });
 
-// ✅ Middleware
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
-// ✅ Create table (runs automatically)
+// Create table if not exists
 pool.query(`
   CREATE TABLE IF NOT EXISTS messages (
     id SERIAL PRIMARY KEY,
     name TEXT,
     email TEXT,
     message TEXT
-  );
+  )
 `).then(() => {
   console.log("Table ready");
 }).catch(err => console.log(err));
 
-// ✅ POST route (save message)
+// Route to save message
 app.post('/send', async (req, res) => {
   const { name, email, message } = req.body;
-
-  console.log("Received:", name, email, message);
 
   try {
     await pool.query(
@@ -41,24 +39,22 @@ app.post('/send', async (req, res) => {
       [name, email, message]
     );
 
-    console.log("Saved to DB:", name, email, message);
+    console.log("New Message:", name, email, message);
 
-    res.json({ success: true });
-
+    res.send("Message sent successfully ✅");
   } catch (err) {
     console.log(err);
-    res.status(500).json({ success: false });
+    res.status(500).send("Error saving message");
   }
 });
 
-// ✅ GET route (view messages - optional)
+// Route to view messages
 app.get('/messages', async (req, res) => {
   const result = await pool.query('SELECT * FROM messages');
   res.json(result.rows);
 });
-console.log("DB version running");
 
-// ✅ Start server
+// Start server
 const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
