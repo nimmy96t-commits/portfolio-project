@@ -1,64 +1,51 @@
-const express = require('express');
-const path = require('path');
-const { Pool } = require('pg');
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Portfolio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-const app = express();
+  <h1>Contact Me</h1>
 
-// ✅ PostgreSQL connection (Render DATABASE_URL)
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+  <form id="contactForm">
+    <input type="text" name="name" placeholder="Your Name" required><br><br>
+    <input type="email" name="email" placeholder="Your Email" required><br><br>
+    <textarea name="message" placeholder="Your Message" required></textarea><br><br>
+    <button type="submit">Send Message</button>
+  </form>
 
-// ✅ Middleware
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.static(__dirname));
+  <script>
+    document.getElementById("contactForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
 
-// ✅ Create table (runs automatically)
-pool.query(`
-  CREATE TABLE IF NOT EXISTS messages (
-    id SERIAL PRIMARY KEY,
-    name TEXT,
-    email TEXT,
-    message TEXT
-  );
-`).then(() => {
-  console.log("Table ready");
-}).catch(err => console.log(err));
+      const name = document.querySelector('input[name="name"]').value;
+      const email = document.querySelector('input[name="email"]').value;
+      const message = document.querySelector('textarea[name="message"]').value;
 
-// ✅ POST route (save message)
-app.post('/send', async (req, res) => {
-  const { name, email, message } = req.body;
+      try {
+        const res = await fetch("/send", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ name, email, message })
+        });
 
-  console.log("Received:", name, email, message);
+        const data = await res.json();
 
-  try {
-    await pool.query(
-      'INSERT INTO messages (name, email, message) VALUES ($1, $2, $3)',
-      [name, email, message]
-    );
+        if (data.success) {
+          alert("Message sent successfully!");
+        } else {
+          alert("Error sending message");
+        }
 
-    console.log("Saved to DB:", name, email, message);
+      } catch (err) {
+        alert("Error sending message");
+      }
+    });
+  </script>
 
-    res.json({ success: true });
-
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ success: false });
-  }
-});
-
-// ✅ GET route (view messages - optional)
-app.get('/messages', async (req, res) => {
-  const result = await pool.query('SELECT * FROM messages');
-  res.json(result.rows);
-});
-
-// ✅ Start server
-const PORT = process.env.PORT || 10000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+</body>
+</html>

@@ -4,12 +4,10 @@ const { Pool } = require('pg');
 
 const app = express();
 
-// PostgreSQL connection
+// PostgreSQL connection (Render DATABASE_URL)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  ssl: { rejectUnauthorized: false }
 });
 
 // Middleware
@@ -17,7 +15,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(__dirname));
 
-// Create table if not exists
+// Create table (runs automatically)
 pool.query(`
   CREATE TABLE IF NOT EXISTS messages (
     id SERIAL PRIMARY KEY,
@@ -25,15 +23,14 @@ pool.query(`
     email TEXT,
     message TEXT
   )
-`).then(() => {
-  console.log("Table ready");
-}).catch(err => console.log(err));
+`).then(() => console.log("Table ready"))
+  .catch(err => console.error(err));
 
-// Route to save message
+// 👉 SEND MESSAGE
 app.post('/send', async (req, res) => {
-  const { name, email, message } = req.body;
-
   try {
+    const { name, email, message } = req.body;
+
     await pool.query(
       'INSERT INTO messages (name, email, message) VALUES ($1, $2, $3)',
       [name, email, message]
@@ -41,14 +38,14 @@ app.post('/send', async (req, res) => {
 
     console.log("New Message:", name, email, message);
 
-    res.send("Message sent successfully ✅");
+    res.json({ success: true });
   } catch (err) {
-    console.log(err);
-    res.status(500).send("Error saving message");
+    console.error(err);
+    res.status(500).json({ success: false });
   }
 });
 
-// Route to view messages
+// 👉 GET MESSAGES
 app.get('/messages', async (req, res) => {
   const result = await pool.query('SELECT * FROM messages');
   res.json(result.rows);
