@@ -1,41 +1,37 @@
 const express = require('express');
 const path = require('path');
+
 const app = express();
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// ✅ VERY IMPORTANT (serve HTML, CSS, JS)
+// Serve frontend files
 app.use(express.static(__dirname));
 
-// Temporary storage (you can replace with DB later)
+// Store messages (temporary)
 let messages = [];
 
-// Route to save message
+// POST route (form submit)
 app.post('/contact', (req, res) => {
     const { name, email, message } = req.body;
 
-    const newMessage = {
-        id: messages.length + 1,
-        name,
-        email,
-        message,
-        created_at: new Date()
-    };
+    console.log("New Message:");
+    console.log(name, email, message);
 
-    messages.push(newMessage);
+    messages.push({ name, email, message });
 
     res.json({ success: true });
 });
 
-// Route to get all messages
+// GET route (view messages)
 app.get('/messages', (req, res) => {
     res.json(messages);
 });
 
 // Start server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 10000;
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
 });
