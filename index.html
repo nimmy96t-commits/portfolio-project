@@ -3,18 +3,25 @@
 <head>
   <meta charset="UTF-8">
   <title>Portfolio</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<h1>Contact Me</h1>
+<div class="container">
 
-<form id="contactForm">
-  <input type="text" name="name" placeholder="Your Name" required><br><br>
-  <input type="email" name="email" placeholder="Your Email" required><br><br>
-  <textarea name="message" placeholder="Your Message" required></textarea><br><br>
-  <button type="submit">Send Message</button>
-</form>
+  <h1 class="name">Nimmy Rose</h1>
+  <p class="course">BCA Cloud Computing</p>
+  <p class="college">Kristu Jayanti Deemed To Be University</p>
+
+  <form id="contactForm">
+    <input type="text" name="name" placeholder="Your Name" required>
+    <input type="email" name="email" placeholder="Your Email" required>
+    <textarea name="message" placeholder="Your Message" required></textarea>
+    <button type="submit">Send Message</button>
+  </form>
+
+</div>
 
 <script>
 document.getElementById("contactForm").addEventListener("submit", async function(e) {

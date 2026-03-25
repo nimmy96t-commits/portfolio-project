@@ -1,34 +1,69 @@
 body {
-    font-family: Arial;
-    background: #0f172a;
-    color: white;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #1f1c2c, #928dab);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
 }
 
+/* Container */
 .container {
-    background: #1e293b;
-    padding: 30px;
-    border-radius: 10px;
-    width: 300px;
+  background: rgba(255, 255, 255, 0.08);
+  padding: 30px;
+  border-radius: 15px;
+  width: 350px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+  text-align: center;
 }
 
+/* Name */
+.name {
+  margin: 0;
+  font-size: 26px;
+  font-weight: bold;
+}
+
+/* Course */
+.course {
+  margin: 5px 0;
+  font-size: 16px;
+  color: #ccc;
+}
+
+/* College */
+.college {
+  margin-bottom: 20px;
+  font-size: 14px;
+  color: #aaa;
+}
+
+/* Inputs */
 input, textarea {
-    width: 100%;
-    margin: 10px 0;
-    padding: 10px;
-    border: none;
-    border-radius: 5px;
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 8px;
+  border: none;
+  outline: none;
 }
 
+/* Button */
 button {
-    width: 100%;
-    padding: 10px;
-    background: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+  width: 100%;
+  padding: 10px;
+  background: #6c63ff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #5548e0;
 }
