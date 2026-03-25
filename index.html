@@ -1,57 +1,74 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Nimmy | Portfolio</title>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-</head>
+    <title>Portfolio</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: #0d0d2b;
+            color: white;
+            text-align: center;
+            padding: 40px;
+        }
 
+        input, textarea {
+            width: 250px;
+            padding: 10px;
+            margin: 10px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #6c63ff;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
 <body>
 
-    <div class="container">
-        <h1>Hello, I'm Nimmy</h1>
-        <p>BCA Cloud Computing Student</p>
+    <h1>Hello, I'm Nimmy</h1>
+    <p>BCA Cloud Computing Student</p>
 
-        <h2>Contact Me</h2>
+    <h2>Contact Me</h2>
 
-        <form id="contactForm">
-            <input type="text" id="name" placeholder="Your name" required>
-            <input type="email" id="email" placeholder="Your email" required>
-            <textarea id="message" placeholder="Your message" required></textarea>
-            <button type="submit">Send Message</button>
-        </form>
-    </div>
+    <form id="contactForm">
+        <input type="text" id="name" placeholder="Your name" required><br>
+        <input type="email" id="email" placeholder="Your email" required><br>
+        <textarea id="message" placeholder="Your message" required></textarea><br>
+        <button type="submit">Send Message</button>
+    </form>
 
-<script>
-const form = document.getElementById("contactForm");
+    <script>
+        document.getElementById("contactForm").addEventListener("submit", async function(e) {
+            e.preventDefault();
 
-form.addEventListener("submit", async function (e) {
-    e.preventDefault();
+            const name = document.getElementById("name").value;
+            const email = document.getElementById("email").value;
+            const message = document.getElementById("message").value;
 
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const message = document.getElementById("message").value;
+            try {
+                const res = await fetch("/contact", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ name, email, message })
+                });
 
-    try {
-        const response = await fetch("/contact", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ name, email, message })
+                const data = await res.json();
+                alert("Message sent successfully!");
+
+            } catch (err) {
+                alert("Error sending message");
+                console.log(err);
+            }
         });
-
-        const text = await response.text();
-        alert(text);
-        form.reset();
-
-    } catch (error) {
-        alert("Error sending message.");
-        console.error(error);
-    }
-});
-</script>
+    </script>
 
 </body>
 </html>
